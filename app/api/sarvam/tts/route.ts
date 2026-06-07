@@ -23,11 +23,11 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         text,
-        speaker: speaker || 'meera',
+        speaker: speaker || 'vidya',
         target_language_code,
         pitch: 0,
         pace: 1.0,
-        loudness: 0
+        loudness: 1.2
       })
     });
 

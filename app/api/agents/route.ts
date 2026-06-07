@@ -7,11 +7,21 @@ interface Question {
   required: boolean;
 }
 
-// Pre-translated agent utterances to support zero-key demo
+const langToCodeMap: { [key: string]: string } = {
+  'English': 'en-IN',
+  'Hindi': 'hi-IN',
+  'Telugu': 'te-IN',
+  'Kannada': 'kn-IN',
+  'Tamil': 'ta-IN',
+  'Malayalam': 'ml-IN',
+};
+
 const TRANSLATED_PROMPTS: { [lang: string]: { [key: string]: string } } = {
   'English': {
-    'welcome': 'Hello! I am your AI Interview Agent. Let\'s get started. What is your full name?',
+    'welcome': "Hello! I am your AI Interview Agent. Let's get started. What is your full name?",
     'autofill_detect': 'I detected CHRIST University and Computer Science in your Monad profile. Should I use them?',
+    'college_name_ask': 'Which college or university do you study in?',
+    'degree_ask': 'What degree or major are you pursuing?',
     'cgpa_ask': 'Great! What is your current CGPA?',
     'projects_ask': 'Nice. Tell me about a recent project you have built.',
     'career_ask': 'Got it. Finally, what are your career goals after graduation?',
@@ -21,6 +31,8 @@ const TRANSLATED_PROMPTS: { [lang: string]: { [key: string]: string } } = {
   'Hindi': {
     'welcome': 'नमस्ते! मैं आपका एआई इंटरव्यू एजेंट हूं। चलिए शुरू करते हैं। आपका पूरा नाम क्या है?',
     'autofill_detect': 'मुझे आपके मोनाड प्रोफ़ाइल में क्राइस्ट यूनिवर्सिटी और कंप्यूटर साइंस मिला है। क्या मुझे उनका उपयोग करना चाहिए?',
+    'college_name_ask': 'आप किस कॉलेज या विश्वविद्यालय में पढ़ते हैं?',
+    'degree_ask': 'आप कौन सी डिग्री या विषय की पढ़ाई कर रहे हैं?',
     'cgpa_ask': 'बहुत बढ़िया! आपका वर्तमान सीजीपीए क्या है?',
     'projects_ask': 'अच्छा। मुझे हाल ही में आपके द्वारा बनाए गए किसी प्रोजेक्ट के बारे में बताएं।',
     'career_ask': 'समझ गया। अंत में, ग्रेजुएशन के बाद आपके करियर के लक्ष्य क्या हैं?',
@@ -30,6 +42,8 @@ const TRANSLATED_PROMPTS: { [lang: string]: { [key: string]: string } } = {
   'Telugu': {
     'welcome': 'నమస్తే! నేను మీ AI ఇంటర్వ్యూ ఏజెంట్. ప్రారంభిద్దాం. మీ పూర్తి పేరు ఏమిటి?',
     'autofill_detect': 'నేను మీ మోనాడ్ ప్రొఫైల్‌లో క్రిస్ట్ యూనివర్సిటీ మరియు కంప్యూటర్ సైన్స్ కనుగొన్నాను. నేను వాటిని ఉపయోగించాలా?',
+    'college_name_ask': 'మీరు ఏ కాలేజీ లేదా విశ్వవిద్యాలయంలో చదువుతున్నారు?',
+    'degree_ask': 'మీరు ఏ డిగ్రీ లేదా మేజర్ చదువుతున్నారు?',
     'cgpa_ask': 'చాలా బాగుంది! మీ ప్రస్తుత సిజిపిఎ ఎంత?',
     'projects_ask': 'మంచిది. మీరు ఇటీవల నిర్మించిన ప్రాజెక్ట్ గురించి నాకు చెప్పండి.',
     'career_ask': 'అర్థమైంది. చివరిగా, గ్రాడ్యుయేషన్ తర్వాత మీ కెరీర్ లక్ష్యాలు ఏమిటి?',
@@ -39,6 +53,8 @@ const TRANSLATED_PROMPTS: { [lang: string]: { [key: string]: string } } = {
   'Kannada': {
     'welcome': 'ನಮಸ್ತೆ! ನಾನು ನಿಮ್ಮ AI ಸಂದರ್ಶನ ಏಜೆಂಟ್. ಪ್ರಾರಂಭಿಸೋಣ. ನಿಮ್ಮ ಪೂರ್ಣ ಹೆಸರು ಏನು?',
     'autofill_detect': 'ನಿಮ್ಮ ಮೊನಾಡ್ ಪ್ರೊಫೈಲ್‌ನಲ್ಲಿ ನಾನು ಕ್ರೈಸ್ಟ್ ಯೂನಿವರ್ಸಿಟಿ ಮತ್ತು ಕಂಪ್ಯೂಟರ್ ಸೈನ್ಸ್ ಅನ್ನು ಪತ್ತೆ ಮಾಡಿದ್ದೇನೆ. ನಾನು ಅವುಗಳನ್ನು ಬಳಸಬೇಕೇ?',
+    'college_name_ask': 'ನೀವು ಯಾವ ಕಾಲೇಜು ಅಥವಾ ವಿಶ್ವವಿದ್ಯಾಲಯದಲ್ಲಿ ಓದುತ್ತಿದ್ದೀರಿ?',
+    'degree_ask': 'ನೀವು ಯಾವ ಪದವಿ ಅಥವಾ ಕೋರ್ಸ್ ಮಾಡುತ್ತಿದ್ದೀರಿ?',
     'cgpa_ask': 'ಉತ್ತಮ! ನಿಮ್ಮ ಪ್ರಸ್ತುತ ಸಿಜಿಪಿಎ ಎಷ್ಟು?',
     'projects_ask': 'ಚೆನ್ನಾಗಿದೆ. ನೀವು ಇತ್ತೀಚೆಗೆ ನಿರ್ಮಿಸಿದ ಯೋಜನೆಯ ಬಗ್ಗೆ ನನಗೆ ತಿಳಿಸಿ.',
     'career_ask': 'ತಿಳಿಯಿತು. ಕೊನೆಯದಾಗಿ, ಪದವಿ ಮುಗಿದ ನಂತರ ನಿಮ್ಮ ವೃತ್ತಿಜೀವನದ ಗುರಿಗಳು ಏನು?',
@@ -48,6 +64,8 @@ const TRANSLATED_PROMPTS: { [lang: string]: { [key: string]: string } } = {
   'Tamil': {
     'welcome': 'வணக்கம்! நான் உங்கள் AI நேர்காணல் முகவர். ஆரம்பிக்கலாம். உங்கள் முழு பெயர் என்ன?',
     'autofill_detect': 'உங்கள் மோனாட் சுயவிவரத்தில் கிறிஸ்ட் பல்கலைக்கழகம் மற்றும் கணினி அறிவியலைக் கண்டறிந்துள்ளேன். அவற்றை நான் பயன்படுத்தலாமா?',
+    'college_name_ask': 'நீங்கள் எந்த கல்லூரி அல்லது பல்கலைக்கழகத்தில் படிக்கிறீர்கள்?',
+    'degree_ask': 'நீங்கள் என்ன பட்டம் அல்லது பாடம் படிக்கிறீர்கள்?',
     'cgpa_ask': 'அற்புதம்! உங்கள் தற்போதைய சிஜிபிஏ என்ன?',
     'projects_ask': 'நல்லது. நீங்கள் சமீபத்தில் உருவாக்கிய ஒரு திட்டத்தைப் பற்றி எனக்குச் சொல்லுங்கள்.',
     'career_ask': 'புரிந்தது. இறுதியாக, பட்டம் பெற்ற பிறகு உங்கள் தொழில் இலக்குகள் என்ன?',
@@ -57,6 +75,8 @@ const TRANSLATED_PROMPTS: { [lang: string]: { [key: string]: string } } = {
   'Malayalam': {
     'welcome': 'ഹലോ! ഞാൻ നിങ്ങളുടെ AI ഇന്റർവ്യൂ ഏജന്റാണ്. നമുക്ക് ആരംഭിക്കാം. നിങ്ങളുടെ മുഴുവൻ പേര് എന്താണ്?',
     'autofill_detect': 'നിങ്ങളുടെ മോണാഡ് പ്രൊഫൈലിൽ ക്രിസ്റ്റ് യൂണിവേഴ്സിറ്റിയും കമ്പ്യൂട്ടർ സയൻസും ഞാൻ കണ്ടെത്തിയിട്ടുണ്ട്. ഞാൻ അവ ഉപയോഗിക്കണോ?',
+    'college_name_ask': 'നിങ്ങൾ ഏത് കോളേജിലാണ് അല്ലെങ്കിൽ യൂണിവേഴ്സിറ്റിയിലാണ് പഠിക്കുന്നത്?',
+    'degree_ask': 'നിങ്ങൾ ഏത് ബിരുദമാണ് അല്ലെങ്കിൽ കോഴ്സാണ് പഠിക്കുന്നത്?',
     'cgpa_ask': 'വളരെ നല്ലത്! നിങ്ങളുടെ ഇപ്പോഴത്തെ സിജിപിഎ എത്രയാണ്?',
     'projects_ask': 'നല്ലത്. നിങ്ങൾ അടുത്തിടെ ചെയ്ത ഒരു പ്രോജക്റ്റിനെക്കുറിച്ച് എന്നോട് പറയുക.',
     'career_ask': 'മനസ്സിലായി. അവസാനമായി, ബിരുദ പഠനത്തിന് ശേഷം നിങ്ങളുടെ കരിയർ ലക്ഷ്യങ്ങൾ എന്തൊക്കെയാണ്?',
@@ -69,12 +89,10 @@ const TRANSLATED_PROMPTS: { [lang: string]: { [key: string]: string } } = {
 function ruleBasedExtraction(questionId: string, text: string): any {
   const cleanText = text.trim();
   if (questionId === 'cgpa') {
-    // Look for decimals or integers
     const numMatch = cleanText.match(/\b\d+(\.\d+)?\b/);
     if (numMatch) {
       return parseFloat(numMatch[0]);
     }
-    // Handle word digits: e.g. "eight point seven"
     const textLower = cleanText.toLowerCase();
     const wordNumbers: { [key: string]: number } = {
       'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
@@ -95,10 +113,9 @@ function ruleBasedExtraction(questionId: string, text: string): any {
     }
     const parsedNum = parseFloat(parsedVal);
     if (!isNaN(parsedNum)) return parsedNum;
-    return 8.5; // default fallback
+    return 8.5;
   }
 
-  // General cleanups for textual names / colleges
   let extracted = cleanText;
   const prefixes = [
     /^my name is\s+/i,
@@ -120,7 +137,6 @@ function ruleBasedExtraction(questionId: string, text: string): any {
     }
   }
 
-  // Capitalize first letters of text for full_name/college_name
   if (questionId === 'full_name' || questionId === 'college_name') {
     extracted = extracted
       .split(' ')
@@ -131,7 +147,6 @@ function ruleBasedExtraction(questionId: string, text: string): any {
   return extracted;
 }
 
-// Call Gemini API for extraction and next question generation
 async function callGemini(prompt: string): Promise<any> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -190,11 +205,8 @@ export async function POST(request: Request) {
     }
 
     const currentLang = language || 'English';
-
-    // 1. Language Agent: Receive and clean userAnswer
     const cleanedAnswer = userAnswer ? userAnswer.trim() : '';
 
-    // Log the incoming answer
     const logs: any[] = [];
     logs.push({
       agent: 'Language Agent',
@@ -202,10 +214,80 @@ export async function POST(request: Request) {
       status: 'success',
     });
 
-    let extractedValue = cleanedAnswer;
-    let newResponses = { ...responses };
+    // 1. Language Agent: Translate user response to English if not in English
+    let translatedAnswer = cleanedAnswer;
+    if (currentLang !== 'English' && cleanedAnswer && currentQuestionId !== 'autofill_prompt') {
+      logs.push({
+        agent: 'Language Agent',
+        message: `Translating response from ${currentLang} to English...`,
+        status: 'active',
+      });
+      
+      const apiKey = process.env.SARVAM_API_KEY;
+      const geminiKey = process.env.GEMINI_API_KEY;
+      
+      try {
+        if (apiKey && !apiKey.includes('your-sarvam')) {
+          const bcpCode = langToCodeMap[currentLang] || 'auto';
+          const translateRes = await fetch('https://api.sarvam.ai/translate', {
+            method: 'POST',
+            headers: {
+              'api-subscription-key': apiKey,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              input: cleanedAnswer,
+              source_language_code: bcpCode,
+              target_language_code: 'en-IN'
+            })
+          });
+          
+          if (translateRes.ok) {
+            const transData = await translateRes.json();
+            translatedAnswer = transData.translated_text;
+            logs.push({
+              agent: 'Language Agent',
+              message: `Translated answer to English: "${translatedAnswer}"`,
+              status: 'success',
+            });
+          } else {
+            throw new Error(`Sarvam translate status: ${translateRes.status}`);
+          }
+        } else if (geminiKey && !geminiKey.includes('your-gemini')) {
+          const translatePrompt = `
+            You are a Translation Agent.
+            Translate the following text from ${currentLang} to English.
+            Original Text: "${cleanedAnswer}"
+            
+            Return ONLY a JSON object:
+            {
+              "translated": "${cleanedAnswer}"
+            }
+          `.replace(/\n/g, ' '); // simple cleaning
+          
+          const finalPrompt = `Translate the following text from ${currentLang} to English. Return ONLY a JSON object of structure {"translated": "extracted English translation"}. Text: "${cleanedAnswer}"`;
+          const gemResult = await callGemini(finalPrompt);
+          translatedAnswer = gemResult.translated || cleanedAnswer;
+          logs.push({
+            agent: 'Language Agent',
+            message: `Translated answer (Gemini): "${translatedAnswer}"`,
+            status: 'success',
+          });
+        }
+      } catch (err: any) {
+        console.error('Answer translation failed:', err);
+        logs.push({
+          agent: 'Language Agent',
+          message: `Translation failed, using raw response.`,
+          status: 'error',
+        });
+      }
+    }
 
-    // 2. Response Extraction Agent
+    let extractedValue = translatedAnswer;
+    const newResponses = { ...responses };
+
+    // 2. Response Extraction Agent: Extract structured value from English answer
     if (currentQuestionId && cleanedAnswer) {
       logs.push({
         agent: 'Extraction Agent',
@@ -214,12 +296,11 @@ export async function POST(request: Request) {
       });
 
       const geminiKey = process.env.GEMINI_API_KEY;
-      if (geminiKey) {
-        // Use Gemini to extract structured response
+      if (geminiKey && !geminiKey.includes('your-gemini')) {
         const prompt = `
           You are a Response Extraction Agent.
           Question ID: "${currentQuestionId}"
-          User Answer Text: "${cleanedAnswer}"
+          User Answer Text (in English): "${translatedAnswer}"
           
           Extract the structured value corresponding to the field.
           For 'cgpa' or 'number', extract as a float/number.
@@ -239,8 +320,7 @@ export async function POST(request: Request) {
             status: 'success',
           });
         } catch (e) {
-          // Fallback to rules-based
-          extractedValue = ruleBasedExtraction(currentQuestionId, cleanedAnswer);
+          extractedValue = ruleBasedExtraction(currentQuestionId, translatedAnswer);
           logs.push({
             agent: 'Extraction Agent',
             message: `Rules-based extracted: ${JSON.stringify(extractedValue)}`,
@@ -248,8 +328,7 @@ export async function POST(request: Request) {
           });
         }
       } else {
-        // Rule-based fallback
-        extractedValue = ruleBasedExtraction(currentQuestionId, cleanedAnswer);
+        extractedValue = ruleBasedExtraction(currentQuestionId, translatedAnswer);
         logs.push({
           agent: 'Extraction Agent',
           message: `Rules-based extracted: ${JSON.stringify(extractedValue)}`,
@@ -306,7 +385,6 @@ export async function POST(request: Request) {
       status: 'success',
     });
 
-    // Translate/Synthesize statement
     const promptDict = TRANSLATED_PROMPTS[currentLang] || TRANSLATED_PROMPTS['English'];
 
     if (!nextQuestionId) {
@@ -320,12 +398,14 @@ export async function POST(request: Request) {
         nextAgentStatement = promptDict['career_ask'];
       } else if (nextQuestionId === 'full_name') {
         nextAgentStatement = promptDict['welcome'];
+      } else if (nextQuestionId === 'college_name') {
+        nextAgentStatement = promptDict['college_name_ask'];
+      } else if (nextQuestionId === 'degree') {
+        nextAgentStatement = promptDict['degree_ask'];
       } else {
-        // Fallback or translate custom field label
         const rawPrompt = `What is your ${nextQuestionId.replace('_', ' ')}?`;
-        
         const geminiKey = process.env.GEMINI_API_KEY;
-        if (geminiKey && currentLang !== 'English') {
+        if (geminiKey && !geminiKey.includes('your-gemini') && currentLang !== 'English') {
           try {
             const translatePrompt = `
               Translate this question to ${currentLang}:

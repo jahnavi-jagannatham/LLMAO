@@ -8,11 +8,44 @@ import {
   Copy, Check, User, School, GraduationCap, Award, MapPin, Briefcase, 
   ArrowLeft, Cpu, AlertCircle, Play, Database, FileCheck, Layers, Globe
 } from 'lucide-react';
-import { useFormStore, nativeLangNames, langToCodeMap, FormQuestion } from '../../store/form-store';
+import { useFormStore, nativeLangNames, langToCodeMap, FormQuestion, ReusableProfile } from '../../store/form-store';
 import { useAccount, useConnect, useDisconnect, useWriteContract, useReadContract } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 import contractJson from '../../../contracts/VoiceForms.json';
 import confetti from 'canvas-confetti';
+
+const FRONTEND_TRANSLATIONS: { [lang: string]: { welcome: string; autofill_detect: string; skip_autofill: string } } = {
+  'English': {
+    welcome: "Hello! I am your AI Interview Agent. Let's get started. What is your full name?",
+    autofill_detect: 'Hello! I detected verified information for "{name}" from "{college}" on your Monad profile. Should I use it to auto-fill the form?',
+    skip_autofill: "No problem. Let's start from the beginning. What is your full name?"
+  },
+  'Hindi': {
+    welcome: 'नमस्ते! मैं आपका एआई इंटरव्यू एजेंट हूं। चलिए शुरू करते हैं। आपका पूरा नाम क्या है?',
+    autofill_detect: 'नमस्ते! मुझे आपके मोनाड प्रोफ़ाइल में "{name}" और "{college}" के लिए सत्यापित जानकारी मिली है। क्या मुझे इसका उपयोग करना चाहिए?',
+    skip_autofill: 'कोई बात नहीं। चलिए शुरू से शुरू करते हैं। आपका पूरा नाम क्या है?'
+  },
+  'Telugu': {
+    welcome: 'నమస్తే! నేను మీ AI ఇంటర్వ్యూ ఏజెంట్. ప్రారంభిద్దాం. మీ పూర్తి పేరు ఏమిటి?',
+    autofill_detect: 'నమస్తే! మీ మోనాడ్ ప్రొఫైల్‌లో "{name}" మరియు "{college}" కోసం ధృవీకరించబడిన సమాచారం కనుగొన్నాను. నేను దానిని ఉపయోగించాలా?',
+    skip_autofill: 'పర్వాలేదు. మొదటి నుండి ప్రారంభిద్దాం. మీ పూర్తి పేరు ఏమిటి?'
+  },
+  'Kannada': {
+    welcome: 'ನಮಸ್ತೆ! ನಾನು ನಿಮ್ಮ AI ಸಂದರ್ಶನ ಏಜೆಂಟ್. ಪ್ರಾರಂಭಿಸೋಣ. ನಿಮ್ಮ ಪೂರ್ಣ ಹೆಸರು ಏನು?',
+    autofill_detect: 'ನಮಸ್ತೆ! ನಿಮ್ಮ ಮೊನಾಡ್ ಪ್ರೊಫೈಲ್‌ನಲ್ಲಿ "{name}" ಮತ್ತು "{college}" ಗಾಗಿ ಪರಿಶೀಲಿಸಿದ ಮಾಹಿತಿಯನ್ನು ಪತ್ತೆ ಮಾಡಿದ್ದೇನೆ. ನಾನು ಅದನ್ನು ಬಳಸಬೇಕೇ?',
+    skip_autofill: 'ಪರವಾಗಿಲ್ಲ. ಮೊದಲಿನಿಂದ ಪ್ರಾರಂಭಿಸೋಣ. ನಿಮ್ಮ ಪೂರ್ಣ ಹೆಸರು ಏನು?'
+  },
+  'Tamil': {
+    welcome: 'வணக்கம்! நான் உங்கள் AI நேர்காணல் முகவர். ஆரம்பிக்கலாம். உங்கள் முழு பெயர் என்ன?',
+    autofill_detect: 'வணக்கம்! உங்கள் மோனாడ్ சுயவிவரத்தில் "{name}" மற்றும் "{college}" க்கான சரிபார்க்கப்பட்ட தகவலைக் கண்டறிந்துள்ளேன். அதை நான் பயன்படுத்தலாமா?',
+    skip_autofill: 'பரவாயில்லை. முதலிலிருந்து ஆரம்பிக்கலாம். உங்கள் முழு பெயர் என்ன?'
+  },
+  'Malayalam': {
+    welcome: 'ഹലോ! ഞാൻ നിങ്ങളുടെ AI ഇന്റർവ്യൂ ഏജന്റാണ്. നമുക്ക് ആരംഭിക്കാം. നിങ്ങളുടെ മുഴുവൻ പേര് എന്താണ്?',
+    autofill_detect: 'ഹലോ! നിങ്ങളുടെ മോണാഡ് പ്രൊഫൈലിൽ "{name}" ഉം "{college}" ഉം പരിശോധിച്ചുറപ്പിച്ച വിവരങ്ങൾ ഞാൻ കണ്ടെത്തിയിട്ടുണ്ട്. ഞാൻ അത് ഉപയോഗിക്കണോ?',
+    skip_autofill: 'സാരമില്ല. നമുക്ക് ആദ്യം മുതൽ ആരംഭിക്കാം. നിങ്ങളുടെ നിങ്ങളുടെ മുഴുവൻ പേര് എന്താണ്?'
+  }
+};
 
 export default function FormRespondent() {
   const params = useParams();
@@ -144,8 +177,9 @@ export default function FormRespondent() {
   }
 
   // Speak Agent Prompts
-  const speakStatement = async (text: string) => {
+  const speakStatement = async (text: string, customLangCode?: string) => {
     setIsAudioPlaying(true);
+    const targetLangCode = customLangCode || languageCode;
     
     // Call Text-to-Speech API
     try {
@@ -154,8 +188,8 @@ export default function FormRespondent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text,
-          target_language_code: languageCode,
-          speaker: 'meera',
+          target_language_code: targetLangCode,
+          speaker: 'vidya',
         }),
       });
 
@@ -166,7 +200,7 @@ export default function FormRespondent() {
         if (typeof window !== 'undefined') {
           window.speechSynthesis.cancel();
           const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = languageCode;
+          utterance.lang = targetLangCode;
           utterance.onend = () => setIsAudioPlaying(false);
           utterance.onerror = () => setIsAudioPlaying(false);
           window.speechSynthesis.speak(utterance);
@@ -201,6 +235,9 @@ export default function FormRespondent() {
     setStage('interview');
     resetInterview();
     
+    const targetLangCode = langToCodeMap[selectedLang] || 'en-IN';
+    const dict = FRONTEND_TRANSLATIONS[selectedLang] || FRONTEND_TRANSLATIONS['English'];
+
     logAgent('Form Agent', 'Form Understanding Agent reading schema...', 'active');
     await new Promise(r => setTimeout(r, 600));
     logAgent('Form Agent', `Identified ${activeForm.questions.length} questions, sequence built.`, 'success');
@@ -225,23 +262,21 @@ export default function FormRespondent() {
     if (profile && profile.name) {
       // Autofill detection prompt
       setActiveAgent('Interview Agent');
-      const introMsg = currentLanguage === 'English'
-        ? `Hello! I detected verified information for "${profile.name}" from "${profile.college}" on your Monad profile. Should I use it to auto-fill the form?`
-        : `नमस्ते! मुझे आपके मोනාഡ് ప్రొఫైల్‌లో "${profile.name}" కి సంబంధించిన వివరాలు లభించాయి. వాటిని ఉపయోగించాలా?`; // rough native prompt
+      const introMsg = dict.autofill_detect
+        .replace('{name}', profile.name)
+        .replace('{college}', profile.college || '');
 
       addChatMessage('agent', introMsg);
       setCurrentQuestionId('autofill_prompt');
-      speakStatement(introMsg);
+      speakStatement(introMsg, targetLangCode);
     } else {
       // Welcome message
       setActiveAgent('Interview Agent');
-      const welcomeText = currentLanguage === 'English' 
-        ? 'Hello! I am your AI Interview Agent. Let\'s get started. What is your full name?'
-        : 'नमस्ते! मैं आपका एआई इंटरव्यू एजेंट हूं। चलिए शुरू करते हैं। आपका पूरा नाम क्या है?'; // dynamic localized welcome
+      const welcomeText = dict.welcome;
 
       addChatMessage('agent', welcomeText);
       setCurrentQuestionId('full_name');
-      speakStatement(welcomeText);
+      speakStatement(welcomeText, targetLangCode);
     }
   };
 
@@ -258,7 +293,7 @@ export default function FormRespondent() {
 
     // Check autofill decision
     if (currentQuestionId === 'autofill_prompt') {
-      const isYes = answer.toLowerCase().includes('yes') || answer.includes('हाँ') || answer.includes('అవును') || answer.includes('ಹೌದು') || answer.includes('ஆம்') || answer.includes('അതെ') || answer.includes('use');
+      const isYes = answer.toLowerCase().includes('yes') || answer.includes('हाँ') || answer.includes('అవును') || answer.includes('హೌದು') || answer.includes('ஆம்') || answer.includes('അതെ') || answer.includes('use');
       
       const profile = monadProfile || { name: 'Jagannatham Jahnavi', college: 'CHRIST University', degree: 'Computer Science', skills: 'Solidity', location: 'Bangalore', experience: '1 year' };
       
@@ -289,10 +324,11 @@ export default function FormRespondent() {
       } else {
         // Standard start
         logAgent('Interview Agent', 'Skipped autofill. Starting normal questionnaire.', 'success');
-        const nextPrompt = 'No problem. Let\'s start from the beginning. What is your full name?';
+        const dict = FRONTEND_TRANSLATIONS[currentLanguage] || FRONTEND_TRANSLATIONS['English'];
+        const nextPrompt = dict.skip_autofill;
         addChatMessage('agent', nextPrompt);
         setCurrentQuestionId('full_name');
-        speakStatement(nextPrompt);
+        speakStatement(nextPrompt, languageCode);
       }
       return;
     }
@@ -340,13 +376,13 @@ export default function FormRespondent() {
       if (data.nextQuestionId) {
         setCurrentQuestionId(data.nextQuestionId);
         addChatMessage('agent', data.nextQuestionText);
-        speakStatement(data.nextQuestionText);
+        speakStatement(data.nextQuestionText, languageCode);
       } else {
         // Complete! Transition to review
         setCurrentQuestionId(null);
         logAgent('Completion Agent', 'All questions answered successfully!', 'success');
         addChatMessage('agent', data.nextQuestionText);
-        speakStatement(data.nextQuestionText);
+        speakStatement(data.nextQuestionText, languageCode);
         
         await new Promise(r => setTimeout(r, 1200));
         setStage('review');

@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 
+// @ts-ignore
 import webpack from "webpack";
 
 const nextConfig: NextConfig = {
