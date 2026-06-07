@@ -1,33 +1,89 @@
-# Monad Blitz Bangalore Submission Process
+# VoiceForms AI 🎙️📄
+> **"Forms become conversations."**
 
-1. Visit the `monad-blitz-bangalore` repo (link here) and fork it.
+VoiceForms AI is a production-ready, AI-native alternative to Google Forms. Instead of manually filling inputs, respondents participate in a natural multilingual voice conversation. The multi-agent orchestrator translates speech in real time, extracts structured answers, and stores reusable user-owned identity credentials on Monad Testnet.
 
-![image](https://github.com/user-attachments/assets/ab46b2ea-ee0f-4237-87ef-c33bb1a94749)
+---
 
-2. Give it your project name, a one-liner description, make sure you are forking `main` branch and click `Create Fork`.
+## 🌟 Vision & Differentiator
 
-![image](https://github.com/user-attachments/assets/ffdebab7-c340-4e14-bd3c-36905f1016a3)
+1. **AI-Native Multilingual Interviews**: Driven by Sarvam AI and Gemini APIs, respondents answer naturally in their native language (**English, Hindi, Telugu, Kannada, Tamil, Malayalam**).
+2. **Monad Reusable Identity Layer**: We do not use Monad simply to store submission hashes. We build a **reusable user-owned identity profile system** on-chain. Future forms query the user's Monad profile and offer to **Smart Autofill** verified data in a single tap.
+3. **On-chain Validation Proofs**: Each completed form generates a canonical JSON representation and a SHA-256 hash. The submission verification record is registered permanently to the Monad Testnet.
 
-3. In your fork you can make all the changes you want, add code of your project, create branches, add information to `README.md`, you can change anything and everything.
+---
 
-4. Once you are done with your project and ready for submission, create a pull request.
+## 🛠️ Technology Stack
+- **Frontend**: Next.js 15 (App Router), TypeScript, Tailwind CSS
+- **State**: Zustand
+- **AI Integration**: Sarvam AI (Speech-to-Text, Text-to-Speech, Translation) + Gemini API (Orchestrator, Extraction)
+- **Web3 Engine**: Wagmi, Viem, Monad Testnet Injected wallet (MetaMask / Rabby)
+- **Solidity Smart Contracts**: `VoiceForms.sol` deployed on Monad Testnet at `0x21268e45412bac4cef41c79b69ef382ed17cb5e2`
 
-![image](https://github.com/user-attachments/assets/58aa7140-55db-49db-9361-332449dbe116)
+---
 
-![image](https://github.com/user-attachments/assets/5c8c61b1-23fd-4177-b06e-e8fca3a61ad4)
+## 🤖 Multi-Agent Architecture
+The application coordinates 6 specialized modular agents:
+- **Form Understanding Agent**: Reads form schema, maps required fields, and tracks interview completion percentage.
+- **Interview Agent**: Tracks conversation context, determines question order, and prompts user naturally.
+- **Language Agent**: Orchestrates translation of inputs/outputs using Sarvam AI, returning native language audios.
+- **Response Extraction Agent**: Extracts structured values (e.g. converting *"my CGPA is eight point seven"* to `{ cgpa: 8.7 }`).
+- **Completion Agent**: Detects missing fields, triggers follow-ups, and approves the form.
+- **Verification Agent**: Computes the canonical SHA-256 submission hash and broadcasts it to Monad.
 
-5. Make sure you are create a pull request to the right repo `monad-developers/monad-blitz-bangalore`.
+---
 
-![image](https://github.com/user-attachments/assets/41774ebc-d64c-43de-b3be-7e46d21bcaba)
+## ⏱️ 60-Second Quick Demo Guide for Judges
 
-6. Make sure you see “Able to merge”, when creating a pull request then you can click `Create Pull Request`.
+For presenting or judging in under a minute, follow this curated flow:
 
-![image](https://github.com/user-attachments/assets/b52f5e6f-9091-43af-9025-f2c61a7d1205)
+1. **Boot Quick Demo Mode**: Toggle the **"Quick Demo"** switch in the top header. This simulates preloading your verified identity profile (Name, College, Degree) from the Monad Registry.
+2. **Choose Language**: Select a language card (e.g., **Kannada** or **Hindi**).
+3. **Trigger Smart Autofill (Key Moment)**: The AI Interview Agent immediately speaks and prompts:
+   > *"I detected verified details in your Monad profile. Should I use them to auto-fill the form?"*
+4. **Accept Autofill**: Click the glowing button **"Yes, Autofill Monad Profile"**. Name, College, and Degree fields fill instantly in the lower pane, with active agent logs updating in the visualizer.
+5. **Answer the Rest by Voice**: Click the **Microphone** icon. Speak into the mic:
+   > *"My CGPA is around eight point seven."* (Follow up projects and goals fields next).
+6. **Canonical Review**: View the extracted responses on the Review Screen. Edits are allowed.
+7. **Monad Verification**: Click **"Submit & Register on Monad"**. It generates a SHA-256 hash, broadcasts to Monad Testnet, fires success confetti, and displays the receipt page showing the Monad Transaction Hash and proof records.
 
-7. Give the pull request your project name and a description of the project (describe as much as you can about your project you can even add video demo links) then click `Create pull request`.
+---
 
-![image](https://github.com/user-attachments/assets/9a3cc30a-498f-4d83-9060-adb11f88eff6)
+## 🚀 Local Setup & Installation
 
-8. Finally verify if you created your pull request correctly by checking the repo on which the pull request is created and the source and destination branch of the pull request!
+### Prerequisites
+- Node.js v18.x or newer
+- An Injected Wallet (MetaMask/Rabby) configured for the **Monad Testnet**:
+  - **RPC URL**: `https://testnet-rpc.monad.xyz`
+  - **Chain ID**: `10143`
+  - **Currency Symbol**: `MON`
+  - **Explorer**: `https://testnet.monadscan.com`
 
-![image](https://github.com/user-attachments/assets/b16befcd-2c29-4520-aa70-29883306e85c)
+### 1. Install Dependencies
+```bash
+npm install
+```
+
+### 2. Configure Environment Variables
+Create a `.env` or `.env.local` file in the root directory:
+```env
+SARVAM_API_KEY="your-sarvam-api-key"
+GEMINI_API_KEY="your-gemini-api-key"
+NEXT_PUBLIC_CONTRACT_ADDRESS="0x21268e45412bac4cef41c79b69ef382ed17cb5e2"
+```
+*(Note: If no API keys are provided, the system gracefully falls back to Web Speech APIs and a preloaded dictionary, allowing the entire flow to run smoothly with zero keys!)*
+
+### 3. Run Development Server
+```bash
+npm run dev
+```
+Open **[http://localhost:3000](http://localhost:3000)** in your browser.
+
+---
+
+## 📂 Solidity Smart Contract
+Deployed Address: **`0x21268e45412bac4cef41c79b69ef382ed17cb5e2`** on Monad Testnet.
+
+The Solidity code is located at [VoiceForms.sol](file:///c:/2026/Monad_2/LLMAO/contracts/VoiceForms.sol).
+- **`saveProfile`**: Stores user-owned verified identity profile attributes on-chain.
+- **`submitVerification`**: Registers form canonical SHA-256 hashes linked to the form ID and submitter address.
